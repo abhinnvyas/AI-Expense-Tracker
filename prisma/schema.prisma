@@ -1,0 +1,40 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+  // directUrl = env("DIRECT_URL")
+}
+
+model User {
+id String @id @default(uuid()) @map("_id")
+name String?
+email String? @unique
+password String
+monthlyBudget Int @default(0)
+currency String @default("INR")
+createdAt DateTime @default(now())
+expenses Expense[]
+}
+
+
+model Expense {
+id String @id @default(uuid()) @map("_id")
+userId String
+user User @relation(fields: [userId], references: [id])
+amount Int // store in whole currency units (₹) for simplicity
+description String
+raw_category String 
+category String
+createdAt DateTime @default(now())
+@@index([userId, createdAt])
+}
