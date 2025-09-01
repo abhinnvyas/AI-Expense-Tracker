@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "AI Expense Tracker",
   description:
     "An AI-powered expense tracker that helps you manage your finances effortlessly.",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -17,12 +18,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        {/* PWA manifest */}
-        <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#e73c3c" />
-        <link rel="icon" href="/favicon.ico" />
-      </head>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
         {children}
         <Analytics />
