@@ -62,7 +62,7 @@ export function TopBar() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64">
-              <DropdownMenuLabel>API Base URL</DropdownMenuLabel>
+              {/* <DropdownMenuLabel>API Base URL</DropdownMenuLabel>
               <div className="px-2 pb-2">
                 <input
                   className="w-full rounded bg-[#0B0F14] border border-gray-700 px-2 py-1 text-sm text-gray-100 outline-none"
@@ -80,8 +80,8 @@ export function TopBar() {
                     Save
                   </Button>
                 </div>
-              </div>
-              <DropdownMenuSeparator />
+              </div> */}
+              {/* <DropdownMenuSeparator /> */}
               <DropdownMenuItem
                 onClick={() => {
                   signOut();
