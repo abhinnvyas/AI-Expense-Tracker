@@ -1,14 +1,19 @@
+import withPWA from "next-pwa";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  images: {
-    unoptimized: true,
-  },
-}
+  eslint: { ignoreDuringBuilds: true },
+  typescript: { ignoreBuildErrors: true },
+  images: { unoptimized: true },
+};
 
-export default nextConfig
+// Correct wrapping
+export default withPWA({
+  pwa: {
+    dest: "public",
+    register: true,
+    skipWaiting: true,
+    disable: process.env.NODE_ENV === "development",
+  },
+  ...nextConfig,
+});

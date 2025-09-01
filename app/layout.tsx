@@ -17,6 +17,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* PWA manifest */}
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#e73c3c" />
+        <link rel="icon" href="/favicon.ico" />
+      </head>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
         {children}
         <Analytics />
