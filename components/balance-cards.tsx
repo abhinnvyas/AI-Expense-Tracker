@@ -5,7 +5,7 @@ import {
   apiGetAvailableBalance,
   apiGetUserBudget,
   apiUpdateBudget,
-} from "@/lib/api";
+} from "../lib/api";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import {
@@ -17,6 +17,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { BalanceCardsSkeleton } from "./skeleton-loader";
 
 const formatUSD = (value: number) =>
   new Intl.NumberFormat("en-US", {
@@ -36,12 +37,21 @@ export function BalanceCards() {
     data: balRes,
     isLoading: balLoading,
     mutate: mutateBal,
-  } = useSWR("balance", apiGetAvailableBalance);
+  } = useSWR("balance", apiGetAvailableBalance, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: true,
+    dedupingInterval: 5000, // Prevent duplicate requests for 5 seconds
+  });
+
   const {
     data: budRes,
     isLoading: budLoading,
     mutate: mutateBud,
-  } = useSWR("budget", apiGetUserBudget);
+  } = useSWR("budget", apiGetUserBudget, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: true,
+    dedupingInterval: 5000,
+  });
 
   const balance = balRes?.data;
   const budget = budRes?.data?.monthlyBudget ?? balance?.budget;
@@ -49,6 +59,10 @@ export function BalanceCards() {
   const [value, setValue] = useState(budget || 0);
 
   const loading = balLoading || budLoading;
+
+  if (loading) {
+    return <BalanceCardsSkeleton />;
+  }
 
   return (
     <section className="mx-auto max-w-xl px-4 pt-4 grid grid-cols-2 gap-3">
@@ -58,7 +72,7 @@ export function BalanceCards() {
           className="mt-1 text-2xl font-semibold text-white"
           suppressHydrationWarning
         >
-          {loading ? "…" : formatUSD(balance?.availableBalance || 0)}
+          {formatUSD(balance?.availableBalance || 0)}
         </div>
         <div className="mt-1 text-xs text-emerald-400" suppressHydrationWarning>
           Spent {formatUSD(balance?.totalExpenses || 0)} this period
@@ -71,9 +85,9 @@ export function BalanceCards() {
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button
-                size="xs"
+                size="sm"
                 variant="secondary"
-                className="bg-[#1F2937] text-gray-100"
+                className="bg-[#1F2937] text-gray-100 h-6 px-2 text-xs"
               >
                 Edit
               </Button>
@@ -107,14 +121,13 @@ export function BalanceCards() {
           className="mt-1 text-2xl font-semibold text-white"
           suppressHydrationWarning
         >
-          {loading ? "…" : formatUSD(budget || 0)}
+          {formatUSD(budget || 0)}
         </div>
         <div className="mt-1 text-xs text-blue-400" suppressHydrationWarning>
-          {loading
-            ? ""
-            : `${formatInt(
-                Math.max(0, (budget || 0) - (balance?.totalExpenses || 0))
-              )} left to allocate`}
+          {formatInt(
+            Math.max(0, (budget || 0) - (balance?.totalExpenses || 0))
+          )}{" "}
+          left to allocate
         </div>
       </div>
     </section>

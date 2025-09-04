@@ -8,9 +8,16 @@ import { ExpenseAIBubble, ExpenseUserBubble } from "./expense-message";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { mutate as globalMutate } from "swr";
+import { ChatExpenseSkeleton } from "./skeleton-loader";
 
 export function ChatExpense() {
-  const { data, isLoading, mutate } = useSWR("expenses", apiGetExpenses);
+  const { data, isLoading, mutate } = useSWR("expenses", apiGetExpenses, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: true,
+    dedupingInterval: 3000, // Prevent duplicate requests for 3 seconds
+    refreshInterval: 0, // Disable automatic refresh
+  });
+
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -53,8 +60,11 @@ export function ChatExpense() {
     try {
       const res = await apiCreateExpense(desc);
       if (res.status && res.data) {
-        // refresh expenses and also balance
-        await Promise.all([mutate(), globalMutate("balance")]);
+        await Promise.all([
+          mutate(),
+          globalMutate("balance"),
+          globalMutate("budget"),
+        ]);
       } else {
         alert(res.message || "Failed to create expense");
       }
@@ -73,9 +83,7 @@ export function ChatExpense() {
         className="mt-4 h-[56vh] overflow-y-auto rounded-2xl bg-[#0B0F14] border border-gray-800 p-3"
       >
         {isLoading ? (
-          <div className="p-4 text-center text-gray-500">
-            Loading conversation…
-          </div>
+          <ChatExpenseSkeleton />
         ) : thread.length === 0 ? (
           <div className="p-4 text-center text-gray-500">
             Start by typing a note like {'"1200 tripod"'} or {'"Coffee 250"'}.
@@ -90,10 +98,18 @@ export function ChatExpense() {
                   key={m.key}
                   expense={m.expense!}
                   onChanged={async () => {
-                    await Promise.all([mutate(), globalMutate("balance")]);
+                    await Promise.all([
+                      mutate(),
+                      globalMutate("balance"),
+                      globalMutate("budget"),
+                    ]);
                   }}
                   onDeleted={async () => {
-                    await Promise.all([mutate(), globalMutate("balance")]);
+                    await Promise.all([
+                      mutate(),
+                      globalMutate("balance"),
+                      globalMutate("budget"),
+                    ]);
                   }}
                 />
               )
