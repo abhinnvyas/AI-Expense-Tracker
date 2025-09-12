@@ -160,3 +160,11 @@ export function formatCurrency(
     return amount.toLocaleString(undefined, { maximumFractionDigits: 2 });
   }
 }
+
+export async function getUserData(): Promise<APIResponse<Expense[]>> {
+  return request(`/api/users/`, { method: "GET" });
+}
+
+export async function deleteUserAccount(): Promise<APIResponse<{}>> {
+  return request(`/api/users/`, { method: "DELETE" });
+}
