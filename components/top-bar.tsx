@@ -10,17 +10,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LogOut, MoreVertical } from "lucide-react";
-import { logout } from "@/lib/api";
 import { useAuth } from "@/hooks/use-auth";
 
 export function TopBar() {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
   const handleLogout = () => {
-    logout();
-    router.push("/");
+    signOut();
   };
 
   return (
@@ -70,76 +68,74 @@ export function TopBar() {
           )}
 
           {/* Mobile dropdown menu */}
-          {user && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="text-gray-400 hover:text-white"
-                >
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                className="w-48 bg-[#0F151B] border-gray-700"
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-gray-400 hover:text-white"
               >
-                {user && (
-                  <>
-                    {/* Mobile navigation - shown on small screens */}
-                    <div className="sm:hidden">
-                      <DropdownMenuItem asChild>
-                        <Link
-                          href="/"
-                          className={`w-full ${
-                            pathname === "/"
-                              ? "text-white bg-gray-800"
-                              : "text-gray-400"
-                          }`}
-                        >
-                          Home
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link
-                          href="/dashboard"
-                          className={`w-full ${
-                            pathname?.startsWith("/dashboard")
-                              ? "text-white bg-gray-800"
-                              : "text-gray-400"
-                          }`}
-                        >
-                          Dashboard
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link
-                          href="/expenses"
-                          className={`w-full ${
-                            pathname?.startsWith("/expenses")
-                              ? "text-white bg-gray-800"
-                              : "text-gray-400"
-                          }`}
-                        >
-                          Expenses
-                        </Link>
-                      </DropdownMenuItem>
-                      <div className="border-t border-gray-700 my-1"></div>
-                    </div>
-
-                    <DropdownMenuItem
-                      onClick={handleLogout}
-                      className="text-red-400"
-                    >
-                      <LogOut className="h-4 w-4 mr-2" />
-                      Sign out
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              className="w-48 bg-[#0F151B] border-gray-700"
+            >
+              {user && (
+                <>
+                  {/* Mobile navigation - shown on small screens */}
+                  <div className="sm:hidden">
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/"
+                        className={`w-full ${
+                          pathname === "/"
+                            ? "text-white bg-gray-800"
+                            : "text-gray-400"
+                        }`}
+                      >
+                        Home
+                      </Link>
                     </DropdownMenuItem>
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/dashboard"
+                        className={`w-full ${
+                          pathname?.startsWith("/dashboard")
+                            ? "text-white bg-gray-800"
+                            : "text-gray-400"
+                        }`}
+                      >
+                        Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/expenses"
+                        className={`w-full ${
+                          pathname?.startsWith("/expenses")
+                            ? "text-white bg-gray-800"
+                            : "text-gray-400"
+                        }`}
+                      >
+                        Expenses
+                      </Link>
+                    </DropdownMenuItem>
+                    <div className="border-t border-gray-700 my-1"></div>
+                  </div>
+
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="text-red-400"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign out
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>

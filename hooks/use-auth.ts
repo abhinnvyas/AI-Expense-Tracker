@@ -29,9 +29,15 @@ export function useAuth() {
   }, []);
 
   async function login(email: string, password: string) {
+    console.log("[v0] useAuth login called with email:", email);
     const res = await apiLogin({ email, password });
+    console.log("[v0] API login response:", res);
     if (res.status && res.data) {
       const { user, token } = res.data as LoginResponse;
+      console.log("[v0] Setting token and user:", {
+        user: user.name,
+        token: token.substring(0, 10) + "...",
+      });
       setToken(token);
       setUser(user);
       setTokenState(token);
@@ -48,13 +54,19 @@ export function useAuth() {
     password: string;
     monthlyBudget: number;
   }) {
+    console.log("[v0] useAuth register called with:", {
+      name: input.name,
+      email: input.email,
+    });
     const res = await apiRegister(input);
+    console.log("[v0] API register response:", res);
     if (res.status) {
       const data = res.data as
         | LoginResponse
         | { user: User; token?: string }
         | undefined;
       if (data && "token" in (data || {}) && data?.token) {
+        console.log("[v0] Registration returned token, auto-logging in");
         setToken((data as LoginResponse).token);
         setTokenState((data as LoginResponse).token);
       }
@@ -68,10 +80,12 @@ export function useAuth() {
     }
   }
 
-  function signOut() {
-    logout();
+  async function signOut() {
+    setUser(null);
     setTokenState(null);
     setUserState(null);
+    logout();
+    router.refresh();
     router.push("/");
   }
 
