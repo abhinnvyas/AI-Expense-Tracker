@@ -4,6 +4,7 @@ import type {
   LoginResponse,
   BalanceData,
   User,
+  PaginatedExpensesResponse,
 } from "./types";
 
 const TOKEN_KEY = "aet_token";
@@ -146,6 +147,25 @@ export async function apiUpdateExpense(
   });
 }
 
+export async function apiGetTodayExpenses(): Promise<APIResponse<Expense[]>> {
+  return request(`/api/expenses/today/`, { method: "GET" });
+}
+
+export async function apiGetPaginatedExpenses(params: {
+  page?: number;
+  limit?: number;
+  search?: string;
+}): Promise<APIResponse<PaginatedExpensesResponse>> {
+  const searchParams = new URLSearchParams();
+  if (params.page) searchParams.set("page", params.page.toString());
+  if (params.limit) searchParams.set("limit", params.limit.toString());
+  if (params.search) searchParams.set("search", params.search);
+
+  return request(`/api/expenses/paginated/?${searchParams.toString()}`, {
+    method: "GET",
+  });
+}
+
 export function formatCurrency(
   amount: number,
   currency = getUser()?.currency || "INR",
@@ -167,4 +187,23 @@ export async function getUserData(): Promise<APIResponse<Expense[]>> {
 
 export async function deleteUserAccount(): Promise<APIResponse<{}>> {
   return request(`/api/users/`, { method: "DELETE" });
+}
+
+export async function apiGetExpensesByDate(params: {
+  startDate?: string;
+  endDate?: string;
+  category?: string;
+  search?: string;
+}): Promise<
+  APIResponse<{ expenses: Expense[]; categories: string[]; totalCount: number }>
+> {
+  const searchParams = new URLSearchParams();
+  if (params.startDate) searchParams.set("startDate", params.startDate);
+  if (params.endDate) searchParams.set("endDate", params.endDate);
+  if (params.category) searchParams.set("category", params.category);
+  if (params.search) searchParams.set("search", params.search);
+
+  return request(`/api/expenses/by-date/?${searchParams.toString()}`, {
+    method: "GET",
+  });
 }

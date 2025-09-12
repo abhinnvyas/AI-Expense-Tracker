@@ -1,7 +1,7 @@
 "use client";
 
 import useSWR from "swr";
-import { apiCreateExpense, apiGetExpenses } from "../lib/api";
+import { apiCreateExpense, apiGetTodayExpenses } from "../lib/api";
 import type { Expense } from "../lib/types";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ExpenseAIBubble, ExpenseUserBubble } from "./expense-message";
@@ -11,12 +11,16 @@ import { mutate as globalMutate } from "swr";
 import { ChatExpenseSkeleton } from "./skeleton-loader";
 
 export function ChatExpense() {
-  const { data, isLoading, mutate } = useSWR("expenses", apiGetExpenses, {
-    revalidateOnFocus: false,
-    revalidateOnReconnect: true,
-    dedupingInterval: 3000, // Prevent duplicate requests for 3 seconds
-    refreshInterval: 0, // Disable automatic refresh
-  });
+  const { data, isLoading, mutate } = useSWR(
+    "today-expenses",
+    apiGetTodayExpenses,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      dedupingInterval: 3000, // Prevent duplicate requests for 3 seconds
+      refreshInterval: 0, // Disable automatic refresh
+    }
+  );
 
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
