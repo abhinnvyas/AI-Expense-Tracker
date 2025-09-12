@@ -237,11 +237,11 @@ export default function ExpensesPage() {
           </div>
 
           {/* Search */}
-          <div className="mb-3">
+          <div className="">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Search expenses"
+                placeholder="Search expenses... (try: coffee, lunch, gas, groceries)"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 bg-[#0B0F14] border-gray-700 text-white text-sm"
@@ -262,25 +262,29 @@ export default function ExpensesPage() {
           </div>
 
           {/* Date Range */}
-          <div className="grid grid-cols-2 gap-2 mb-3">
+          <div className="space-y-3 mb-3">
             <div>
-              <label className="text-xs text-gray-400 mb-1 block">From</label>
+              <label className="text-xs text-gray-400 mb-2 block">
+                From Date
+              </label>
               <Input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 max={today}
-                className="bg-[#0B0F14] border-gray-700 text-white text-sm"
+                className="bg-[#0B0F14] border-gray-700 text-white text-sm w-full"
               />
             </div>
             <div>
-              <label className="text-xs text-gray-400 mb-1 block">To</label>
+              <label className="text-xs text-gray-400 mb-2 block">
+                To Date
+              </label>
               <Input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 max={today}
-                className="bg-[#0B0F14] border-gray-700 text-white text-sm"
+                className="bg-[#0B0F14] border-gray-700 text-white text-sm w-full"
               />
             </div>
           </div>
