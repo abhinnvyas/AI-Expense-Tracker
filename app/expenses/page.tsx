@@ -30,8 +30,12 @@ import {
 import { mutate as globalMutate } from "swr";
 import Link from "next/link";
 import type { Expense } from "@/lib/types";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function ExpensesPage() {
+  const { useAuthGuard } = useAuth();
+  const { isAuthenticated, loading: authLoading } = useAuthGuard();
+
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -43,15 +47,31 @@ export default function ExpensesPage() {
   const [editCategory, setEditCategory] = useState("");
   const [updateLoading, setUpdateLoading] = useState(false);
 
+  const [hasFilters, setHasFilters] = useState(false);
+
+  const { data: categoriesData } = useSWR(
+    "available-categories",
+    () => apiGetExpensesByDate({}),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
+  );
+
+  const availableCategories = categoriesData?.data?.categories || [];
+
+  useEffect(() => {
+    setHasFilters(
+      Boolean(startDate || endDate || selectedCategory !== "all" || searchTerm)
+    );
+  }, [startDate, endDate, selectedCategory, searchTerm]);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchTerm);
     }, 300);
     return () => clearTimeout(timer);
   }, [searchTerm]);
-
-  const hasFilters =
-    startDate || endDate || selectedCategory !== "all" || debouncedSearch;
 
   const { data, isLoading, mutate } = useSWR(
     shouldFetch || hasFilters
@@ -102,7 +122,6 @@ export default function ExpensesPage() {
 
   const expensesData = data?.data;
   const expenses = expensesData?.expenses || [];
-  const categories = expensesData?.categories || [];
 
   const handleExpenseDelete = async (id: string) => {
     try {
@@ -205,10 +224,7 @@ export default function ExpensesPage() {
           <div className="flex items-center gap-2 mb-3">
             <Filter className="h-4 w-4 text-gray-400" />
             <span className="text-sm text-gray-400">Filters</span>
-            {(startDate ||
-              endDate ||
-              selectedCategory !== "all" ||
-              searchTerm) && (
+            {hasFilters && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -225,7 +241,7 @@ export default function ExpensesPage() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Search expenses... (try: coffee, lunch, gas, groceries)"
+                placeholder="Search expenses"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 bg-[#0B0F14] border-gray-700 text-white text-sm"
@@ -281,7 +297,7 @@ export default function ExpensesPage() {
               </SelectTrigger>
               <SelectContent className="bg-[#0F151B] border-gray-700">
                 <SelectItem value="all">All Categories</SelectItem>
-                {categories.map((category) => (
+                {availableCategories.map((category) => (
                   <SelectItem key={category} value={category}>
                     {category}
                   </SelectItem>
