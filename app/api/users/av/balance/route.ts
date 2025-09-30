@@ -13,12 +13,26 @@ export async function GET(req: NextRequest) {
 
     const userId = authResult.userId!;
 
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+
+    // Calculate start of next month
+    const startOfNextMonth = new Date(startOfMonth);
+    startOfNextMonth.setMonth(startOfNextMonth.getMonth() + 1);
+
     // Get user with their budget and expenses
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: {
         monthlyBudget: true,
         expenses: {
+          where: {
+            createdAt: {
+              gte: startOfMonth,
+              lt: startOfNextMonth,
+            },
+          },
           select: { amount: true },
         },
       },
